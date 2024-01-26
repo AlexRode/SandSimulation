@@ -1,0 +1,14 @@
+private void moveSand(int x, int y) {
+    // Limpa o quadrado atual de areia
+    clearSand(x, y);
+
+    // Desenha areia no quadrado abaixo
+    for (int i = x; i < x + gridSize; i++) {
+        for (int j = y + gridSize; j < y + gridSize * 2; j++) {
+            if (i < width && j < height) {
+              
+                canvas.setRGB(i, j, Color.YELLOW.getRGB());
+            }
+        }
+    }
+}
