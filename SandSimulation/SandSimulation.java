@@ -14,25 +14,31 @@ public class SandSimulation extends JFrame {
     private JSlider radiusSlider;
     private int sandRadius = 10;
     private final int sliderHeight = 50;
-    private final int width = 800;
-    private final int height = 600;
-    private final int gridSize = 10;
+    public static final int width = 800; // Largura do canvas como uma constante estática
+    public static final int height = 600; // Altura do canvas como uma constante estática
+    public static final int gridSize = 10;
    
+    public static int getGridsize() {
+        return gridSize;
+    }
     private BufferedImage canvas;
     private DrawCanvas drawCanvas;
     private boolean mousePressed = false;
     private Timer sandTimer;
+    
+
+    public Particle[][] grid;
 
     private ArrayList<SandParticle> sandParticles;
 
     public SandSimulation() {
         canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        drawCanvas = new DrawCanvas(canvas, width, height, gridSize);
+        drawCanvas = new DrawCanvas( this,canvas);
         initUI();
         initSlider();
-        sandTimer = new Timer(100, e -> addSandContinuously());
+        sandTimer = new Timer(10, e -> addSandContinuously());
         sandParticles = new ArrayList<SandParticle>();
-         Timer timer = new Timer(65, new ActionListener() {
+         Timer timer = new Timer((int) 0.75, new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -43,7 +49,15 @@ public class SandSimulation extends JFrame {
         timer.start();
     }
     
-    private void updateSand() {
+        private void updateSand() {
+            // Crie uma cópia da lista atual para evitar a modificação simultânea.
+            ArrayList<SandParticle> particlesCopy = new ArrayList<>(sandParticles);
+            for (SandParticle particle : particlesCopy) {
+                particle.update();
+            }
+            repaint(); 
+        }
+     /*private void updateSand() {
         // Varre a imagem de baixo para cima, começando pelo segundo quadrado do fundo até o topo.
         for (int y = height - gridSize * 2; y > 0; y -= gridSize) {
             for (int x = 0; x <= width - gridSize; x += gridSize) {
@@ -70,19 +84,21 @@ public class SandSimulation extends JFrame {
             }
         }
     }
-    
-    private void moveSand(int fromX, int fromY, int toX, int toY) {
+ */
+     /*public void moveSand(int fromX, int fromY, int toX, int toY) {
         // Limpa o quadrado atual de areia
-        clearSand(fromX, fromY);
+        //clearSand(fromX, fromY);
     
         // Adiciona areia no novo quadrado
         fillGridSquareWithSand(toX, toY);
     }
+    */
     private void addSandContinuously() {
     Point mousePos = MouseInfo.getPointerInfo().getLocation();
     SwingUtilities.convertPointFromScreen(mousePos, drawCanvas);
     if (drawCanvas.contains(mousePos)) {
         addSand(mousePos.x, mousePos.y);
+       
     }
 }
     
@@ -99,7 +115,7 @@ public class SandSimulation extends JFrame {
     }
 */
 private void initUI() {
-    drawCanvas = new DrawCanvas(canvas, width, height, gridSize);
+    drawCanvas = new DrawCanvas(this,canvas);
     add(drawCanvas, BorderLayout.CENTER);
 
     // Configura a janela
@@ -111,7 +127,7 @@ private void initUI() {
     // Inclui as dimensões das bordas e da barra de título
     setPreferredSize(new Dimension(width, height + sliderHeight*2));
     //pack();
-   Insets insets = getInsets();
+    Insets insets = getInsets();
     int frameWidth = width + insets.left + insets.right;
     int frameHeight = height + insets.top + insets.bottom;
     int totalheight = frameHeight + sliderHeight;
@@ -176,42 +192,35 @@ private void startSandTimer(MouseEvent e) {
     }
     sandTimer.start();
 }
+public void addSand(int x, int y) {
+    // Converte coordenadas do mouse para coordenadas da grade
+    int gridX = x / gridSize;
+    int gridY = y / gridSize;
 
-// O método addSand agora precisa lidar com o raio
-private void addSand(int mouseX, int mouseY) {
-    int halfGridSize = gridSize / 2;
+    // Cria e adiciona nova partícula de areia à lista
+    SandParticle newParticle = new SandParticle(this, gridX, gridY);
+    sandParticles.add(newParticle);
 
-    // Calcula a área do círculo em torno do ponto onde o mouse foi pressionado
-    int minX = Math.max((mouseX - sandRadius) / gridSize * gridSize, 0);
-    int maxX = Math.min((mouseX + sandRadius) / gridSize * gridSize, width - gridSize);
-    int minY = Math.max((mouseY - sandRadius) / gridSize * gridSize, 0);
-    int maxY = Math.min((mouseY + sandRadius) / gridSize * gridSize, height - gridSize);
-
-    // Adiciona areia nos quadrados que estão dentro do raio
-    for (int x = minX; x <= maxX; x += gridSize) {
-        for (int y = minY; y <= maxY; y += gridSize) {
-            int centerX = x + halfGridSize;
-            int centerY = y + halfGridSize;
-            double distance = Math.sqrt(Math.pow(centerX - mouseX, 2) + Math.pow(centerY - mouseY, 2));
-            if (distance <= sandRadius) {
-                fillGridSquareWithSand(x, y);
-            }
-        }
-    }
+    // Marca o canvas para repintura
     drawCanvas.repaint();
 }
 
-private void fillGridSquareWithSand(int x, int y) {
-    for (int i = x; i < x + gridSize; i++) {
-        for (int j = y; j < y + gridSize; j++) {
-            if (i >= 0 && i < width && j >= 0 && j < height) {
-                canvas.setRGB(i, j, Color.YELLOW.getRGB());
-                sandParticles.add(new SandParticle(x,y));
-            }
-        }
+/*public void addSand(int x, int y) {
+    // Verifique se a posição do pixel está dentro dos limites do canvas
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+        // Pinte o pixel no canvas
+        canvas.setRGB(x, y, Color.YELLOW.getRGB());
+        
+        // Adicione a nova partícula à lista para rastreamento na simulação
+        SandParticle particle = new SandParticle(this, x, y);
+        sandParticles.add(particle);
+        
+        // Solicite a repintura do componente para mostrar a nova partícula
+        drawCanvas.repaint();
     }
-}
-private boolean isSand(int x, int y) {
+}*/
+
+public boolean isSand(int x, int y) {
     // Verifica se todo o quadrado contém areia
     for (int i = x; i < x + gridSize; i++) {
         for (int j = y; j < y + gridSize; j++) {
@@ -229,15 +238,7 @@ private boolean isSand(int x, int y) {
 */
 
 
-private void clearSand(int x, int y) {
-    // Limpa o quadrado de areia
-    for (int i = x; i < x + gridSize; i++) {
-        for (int j = y; j < y + gridSize; j++) {
-            if (i < width && j < height) {
-                canvas.setRGB(i, j, new Color(0, 0, 0, 0).getRGB()); // Ou a cor do fundo
-            }
-        }
-    }
+
 /*
  //////////////sem grid////////////////
 private void moveSand(int x, int y) {
@@ -245,9 +246,9 @@ private void moveSand(int x, int y) {
     canvas.setRGB(x, y + 1, Color.YELLOW.getRGB()); // Coloca a areia na posição abaixo
 }
 */
-}
 
-private boolean isClear(int x, int y) {
+
+public boolean isClear(int x, int y) {
     // Verifica se todo o quadrado está vazio
     for (int i = x; i < x + gridSize; i++) {
         for (int j = y; j < y + gridSize; j++) {
@@ -267,5 +268,34 @@ public void addParticle(SandParticle p) {
   public ArrayList<SandParticle> getParticles() {
     return sandParticles;
   } 
-
+  public boolean isSpaceFree(int x, int y) {
+    for (int i = x; i < x + gridSize; i++) {
+        for (int j = y; j < y + gridSize; j++) {
+            if (i >= width || j >= height) {
+                return false; // O pixel está fora do canvas, então o quadrado não está vazio
+            }
+        }
+    }
+    // Aqui você precisa verificar se a posição está ocupada por outra partícula
+    // Esta verificação depende de como você armazena e gerencia as partículas
+    // Por exemplo, se você está usando um BufferedImage, pode verificar a cor do pixel
+    Color pixelColor = new Color(canvas.getRGB(x, y), true);
+    return pixelColor.equals(new Color(0, 0, 0, 0)); // Considerando preto como cor "livre"
+}
+public void fillGridSquareWithSand(int x, int y) {
+    // Preenche o quadrado no canvas
+    for (int i = x * gridSize; i < (x + 1) * gridSize; i++) {
+        for (int j = y * gridSize; j < (y + 1) * gridSize; j++) {
+            canvas.setRGB(i, j, Color.YELLOW.getRGB());
+        }
+    }
+    // Não precisa adicionar a partícula aqui, pois ela já está na lista
+}
+public void clearSand(int x, int y) {
+    for (int i = x * gridSize; i < (x + 1) * gridSize; i++) {
+        for (int j = y * gridSize; j < (y + 1) * gridSize; j++) {
+            canvas.setRGB(i, j, new Color(0, 0, 0, 0).getRGB()); // Cor de fundo
+        }
+    }
+}
 }

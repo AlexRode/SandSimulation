@@ -1,51 +1,28 @@
+import java.awt.Graphics;
+import java.lang.reflect.Modifier;
+
 import javafx.scene.paint.Color;
 
-class SandParticle {
+class SandParticle extends Particle{
     public int x, y;     // Posição da partícula
     public float velocity; // Velocidade da partícula
-    public Color color ; 
+    private Color color = Color.YELLOW; 
+    protected ParticleType type;
+    private SandSimulation simulation;
 
-    public SandParticle(int x, int y) {
+
+public SandParticle(SandSimulation simulation,int x, int y) {
+    
+        super(x, y, ParticleType.SAND);
+        // Inicializar outras propriedades específicas de SandParticle
         this.x = x;
         this.y = y;
         this.velocity = 0;
+        this.type = ParticleType.SAND;
         this.color = Color.YELLOW;
+        this.simulation = simulation;
     }
 
-
- 
-/*
-// Em algum lugar do seu código, você deve inicializar um array de SandParticle.
-SandParticle[][] particles = new SandParticle[width/gridSize][height/gridSize];
-
-private void updateSand() {
-    for (int y = height/gridSize - 2; y >= 0; y--) {
-        for (int x = 0; x < width/gridSize; x++) {
-            SandParticle particle = particles[x][y];
-            if (particle != null) {
-                // Aumentar a velocidade devido à gravidade
-                particle.velocity += 0.1; // Aceleração gravitacional
-
-                // Calcula a nova posição baseada na velocidade
-                int newY = (int) (y + particle.velocity);
-                if (newY >= height/gridSize) {
-                    newY = height/gridSize - 1;
-                }
-
-                // Verifica se o espaço está livre
-                if (isClear(particle.x, newY)) {
-                    moveSand(particle.x, particle.y, particle.x, newY);
-                    particles[particle.x][newY] = particle;
-                    particles[particle.x][particle.y] = null;
-                    particle.y = newY;
-                } else {
-                    particle.velocity = 0; // Reset velocidade se colidir
-                }
-            }
-        }
-    }
-}
-*/
 public int getX() {
     return x;
 }
@@ -69,5 +46,53 @@ public void setY(int y) {
 public void setVelocity(float d) {
     this.velocity = d;
 }
+
+public Color getColor() {
+    return color;
+}
+@Override
+public void update() {
+    int newX = x;
+    int newY = y + 1; // Tenta mover para baixo
+
+    if (simulation.isSpaceFree(newX, newY)) {
+        moveTo(newX, newY);
+    } else {
+        boolean moveLeft = Math.random() < 0.5;
+        if (moveLeft && simulation.isSpaceFree(x - 1, y + 1)) {
+            moveTo(x - 1, y + 1);
+        } else if (!moveLeft && simulation.isSpaceFree(x + 1, y + 1)) {
+            moveTo(x + 1, y + 1);
+        }
+        // Se não puder mover, a partícula fica no mesmo lugar
+    }
+}
+
+
+
+
+
+private boolean canMoveTo(int newX, int newY) {
+    // Implemente a lógica para verificar se a partícula pode se mover para a nova posição.
+    // Isso normalmente envolve verificar se a nova posição está dentro dos limites
+    // e se não está ocupada por outra partícula.
+    return simulation.isSpaceFree(newX, newY);
+}
+
+private void moveTo(int newX, int newY) {
+    simulation.clearSand(x, y);
+    simulation.fillGridSquareWithSand(newX, newY);
+    // Atualiza a posição da partícula.
+    x = newX;
+    y = newY;
+}
+
+@Override
+public void draw(Graphics g) {
+    g.setColor(java.awt.Color.YELLOW);
+    g.fillRect(x * SandSimulation.gridSize, y * SandSimulation.gridSize, 
+               SandSimulation.gridSize, SandSimulation.gridSize);
+}
+
 }
 

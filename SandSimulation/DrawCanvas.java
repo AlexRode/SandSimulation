@@ -4,31 +4,33 @@ import java.awt.image.BufferedImage;
 
 public class DrawCanvas extends JPanel {
     private BufferedImage canvas;
-    private int width;
-    private int height;
-    private int gridSize;
+    private SandSimulation simulation;
 
-    public DrawCanvas(BufferedImage canvas, int width, int height, int gridSize) {
+    public DrawCanvas(SandSimulation simulation, BufferedImage canvas) {
+        this.simulation = simulation;
         this.canvas = canvas;
-        this.width = width;
-        this.height = height;
-        this.gridSize = gridSize;
     }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(canvas, 0, 0, null);
-
-       g.setColor(Color.GRAY);
-
-       //desenhar o gri
-       /*  for (int i = 0; i < width; i += gridSize) {
-            g.drawLine(i, 0, i, height);
+    
+        // Desenha cada partícula de areia
+        for (SandParticle particle : simulation.getParticles()) {
+            particle.draw(g);
         }
-        for (int i = 0; i < height; i += gridSize) {
-            g.drawLine(0, i, width, i);
-        }
-         */
     }
+    
+  /*   @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(canvas, 0, 0, this);
+
+        // Desenha cada partícula de areia
+        for (SandParticle particle : simulation.getParticles()) {
+            particle.draw(g);
+        }
+    }
+    */
 }
+
+
