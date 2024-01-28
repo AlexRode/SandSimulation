@@ -1,17 +1,21 @@
+import java.awt.Color;
 import java.awt.Graphics;
 
-public abstract class Particle {
-    protected int x, y;
-    protected ParticleType type;
+abstract class Particle {
+    // Propriedades comuns, como cor
+    protected String name;
+    protected Color color;
 
-    public Particle(int x, int y, ParticleType type) {
-        this.x = x;
-        this.y = y;
-        this.type = type;
+    // Construtor
+    public Particle(String name, Color color) {
+        this.color = color;
+        this.name=name;
     }
-    public abstract void update(); 
-    public abstract void draw(Graphics g);
-// Método para atualizar o estado da partícula
-}
 
+    // Método abstrato para desenhar a partícula
+    public abstract void draw(Graphics g, int x, int y, int size);
+    
+    public abstract void update(Particle[][] grid, int x, int y);
+
+}
 

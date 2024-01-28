@@ -1,98 +1,56 @@
+import java.awt.Color;
 import java.awt.Graphics;
-import java.lang.reflect.Modifier;
+import java.util.Random;
 
-import javafx.scene.paint.Color;
+class SandParticle extends Particle {
 
-class SandParticle extends Particle{
-    public int x, y;     // Posição da partícula
-    public float velocity; // Velocidade da partícula
-    private Color color = Color.YELLOW; 
-    protected ParticleType type;
-    private SandSimulation simulation;
+    public SandParticle() {
+        super("SAND", Color.YELLOW); // Cor específica para areia
+    }
 
+    @Override
+    public void draw(Graphics g, int x, int y, int size) {
+        g.setColor(color);
+        g.fillRect(x, y, size, size); // Preenche o quadrado com a cor da partícula
+    }
 
-public SandParticle(SandSimulation simulation,int x, int y) {
+    @Override
+    public void update(Particle[][] grid, int x, int y) {
+        int gridWidth = grid.length;
+        int gridHeight = grid[0].length;
+        Random random = new Random(); // Para a aleatoriedade
     
-        super(x, y, ParticleType.SAND);
-        // Inicializar outras propriedades específicas de SandParticle
-        this.x = x;
-        this.y = y;
-        this.velocity = 0;
-        this.type = ParticleType.SAND;
-        this.color = Color.YELLOW;
-        this.simulation = simulation;
-    }
-
-public int getX() {
-    return x;
-}
-
-public int getY() {
-    return y;
-}
-
-public float getVelocity() {
-    return velocity;
-}
-
-public void setX(int x) {
-    this.x = x;
-}
-
-public void setY(int y) {
-    this.y = y;
-}
-
-public void setVelocity(float d) {
-    this.velocity = d;
-}
-
-public Color getColor() {
-    return color;
-}
-@Override
-public void update() {
-    int newX = x;
-    int newY = y + 1; // Tenta mover para baixo
-
-    if (simulation.isSpaceFree(newX, newY)) {
-        moveTo(newX, newY);
-    } else {
-        boolean moveLeft = Math.random() < 0.5;
-        if (moveLeft && simulation.isSpaceFree(x - 1, y + 1)) {
-            moveTo(x - 1, y + 1);
-        } else if (!moveLeft && simulation.isSpaceFree(x + 1, y + 1)) {
-            moveTo(x + 1, y + 1);
+        // Verifica se não está na parte inferior do grid
+        if (y < gridHeight - 1) {
+            boolean moved = false;
+    
+            // Verifica a célula diretamente abaixo
+            if (grid[x][y + 1] == null) {
+                grid[x][y + 1] = this;
+                grid[x][y] = null;
+                moved = true;
+            } else {
+                // Decide aleatoriamente cair para a esquerda ou para a direita
+                int dir = random.nextBoolean() ? 1 : -1;
+    
+                // Verifica se a célula diagonal na direção escolhida está disponível
+                if (x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y + 1] == null) {
+                    grid[x + dir][y + 1] = this;
+                    grid[x][y] = null;
+                    moved = true;
+                }
+                // Tenta a direção oposta se a primeira escolha não estiver disponível
+                else if (x - dir >= 0 && x - dir < gridWidth && grid[x - dir][y + 1] == null) {
+                    grid[x - dir][y + 1] = this;
+                    grid[x][y] = null;
+                    moved = true;
+                }
+            }
+            
+            // Se a partícula não pôde se mover para baixo ou diagonalmente, permanece no lugar
+            if (!moved) {
+                grid[x][y] = this;
+            }
         }
-        // Se não puder mover, a partícula fica no mesmo lugar
     }
 }
-
-
-
-
-
-private boolean canMoveTo(int newX, int newY) {
-    // Implemente a lógica para verificar se a partícula pode se mover para a nova posição.
-    // Isso normalmente envolve verificar se a nova posição está dentro dos limites
-    // e se não está ocupada por outra partícula.
-    return simulation.isSpaceFree(newX, newY);
-}
-
-private void moveTo(int newX, int newY) {
-    simulation.clearSand(x, y);
-    simulation.fillGridSquareWithSand(newX, newY);
-    // Atualiza a posição da partícula.
-    x = newX;
-    y = newY;
-}
-
-@Override
-public void draw(Graphics g) {
-    g.setColor(java.awt.Color.YELLOW);
-    g.fillRect(x * SandSimulation.gridSize, y * SandSimulation.gridSize, 
-               SandSimulation.gridSize, SandSimulation.gridSize);
-}
-
-}
-
