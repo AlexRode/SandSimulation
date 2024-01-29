@@ -3,9 +3,19 @@ import java.awt.Graphics;
 import java.util.Random;
 
 class WaterParticle extends Particle{
+    int velocity = 1; // A velocidade inicial da partícula de água
+    static final int MAX_VELOCITY = 3; // Velocidade máxima de queda
+    private static final Color[] WATER_COLORS = {
+        new Color(0, 191, 255, 128), // Azul claro com transparência
+       // new Color(70, 130, 180, 128), // Azul aço com transparência
+        new Color(135, 206, 235, 128), // Azul céu com transparência
+        // Adicione mais cores aqui se desejar
+    };
+
+
     private Random random = new Random();
     public WaterParticle() {
-        super("WATER", Color.BLUE);
+        super("WATER", WATER_COLORS[new Random().nextInt(WATER_COLORS.length)]);
         //TODO Auto-generated constructor stub
     }
 
@@ -18,32 +28,49 @@ class WaterParticle extends Particle{
     public void update(Particle[][] grid, int x, int y) {
         int gridWidth = grid.length;
         int gridHeight = grid[0].length;
-    
-        int maxFallDistance = 1; // Define a distância máxima que a partícula pode cair
-        int fallDistance = 0;
-    
-        // Procura pela maior distância de queda possível dentro do limite
-        for (int i = 1; i <= maxFallDistance; i++) {
+        Random random = new Random();
+
+        // Primeiro, tente mover-se para baixo, aumentando a velocidade
+        boolean movedDown = false;
+        for (int i = 1; i <= Math.min(velocity, MAX_VELOCITY); i++) {
             if (y + i < gridHeight && grid[x][y + i] == null) {
-                fallDistance = i;
-            } else {
-                break; // Interrompe se encontrar uma célula ocupada
+                grid[x][y + i] = this;
+                grid[x][y] = null;
+                y = y + i; // Atualiza a posição atual da partícula
+                movedDown = true;
+                break;
             }
         }
-    
-        if (fallDistance > 0) {
-            // Mover a partícula para baixo se possível
-            grid[x][y + fallDistance] = this;
-            grid[x][y] = null;
+        if (movedDown) {
+            velocity = Math.min(velocity + 1, MAX_VELOCITY);
+            return;
         } else {
-            // Se não puder cair, tente mover-se horizontalmente
-            int dir = random.nextBoolean() ? 1 : -1;
+            velocity = 1; // Reseta a velocidade se não se moveu para baixo
+        }
+
+        // Tente mover-se lateralmente ou diagonalmente com escolha aleatória da direção
+        int[] directions = random.nextBoolean() ? new int[]{1, -1} : new int[]{-1, 1};
+        for (int dir : directions) {
+            // Movimento lateral
             if (x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y] == null) {
                 grid[x + dir][y] = this;
                 grid[x][y] = null;
+                return;
+            }
+
+            // Movimento diagonal
+            if (y < gridHeight - 1 && x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y + 1] == null) {
+                grid[x + dir][y + 1] = this;
+                grid[x][y] = null;
+                return;
             }
         }
+        
     }
+
+    
+    
+    
     
      /*@Override
     public void update(Particle[][] grid, int x, int y) {

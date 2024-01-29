@@ -3,9 +3,16 @@ import java.awt.Graphics;
 import java.util.Random;
 
 class SandParticle extends Particle {
-
+    private static final Color[] SAND_COLORS = {
+        new Color(194, 178, 128), // Bege
+        new Color(237, 201, 175), // Creme
+        new Color(213, 196, 161), // Castanho claro
+        //new Color(255, 255, 204), // Amarelo claro
+        new Color(255, 239, 153), // Amarelo dourado
+        // Adicione mais cores aqui se desejar
+    };
     public SandParticle() {
-        super("SAND", Color.YELLOW); // Cor específica para areia
+        super("SAND", SAND_COLORS[new Random().nextInt(SAND_COLORS.length)]); // Cor específica para areia
     }
 
     @Override
@@ -13,8 +20,32 @@ class SandParticle extends Particle {
         g.setColor(color);
         g.fillRect(x, y, size, size); // Preenche o quadrado com a cor da partícula
     }
-
     @Override
+    public void update(Particle[][] grid, int x, int y) {
+        int gridWidth = grid.length;
+        int gridHeight = grid[0].length;
+        Random random = new Random();
+    
+        // Verifica se não está na parte inferior do grid
+        if (y < gridHeight - 1) {
+            int[] directions = {0, random.nextBoolean() ? 1 : -1, -1 * (random.nextBoolean() ? 1 : -1)};
+    
+            for (int dir : directions) {
+                int newX = x + dir;
+    
+                // Verifica se a célula está dentro do grid e se está disponível
+                if (newX >= 0 && newX < gridWidth && grid[newX][y + 1] == null) {
+                    grid[newX][y + 1] = this;
+                    grid[x][y] = null;
+                    return; // Sai da função após mover a partícula
+                }
+            }
+        }
+    }
+
+
+
+    /*@Override
     public void update(Particle[][] grid, int x, int y) {
         int gridWidth = grid.length;
         int gridHeight = grid[0].length;
@@ -52,5 +83,5 @@ class SandParticle extends Particle {
                 grid[x][y] = this;
             }
         }
-    }
+    }*/
 }

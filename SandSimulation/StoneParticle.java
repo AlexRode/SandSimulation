@@ -1,14 +1,22 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Random;
 import java.util.Vector;
 
 public class StoneParticle extends Particle {
+    private static final Color[] STONE_COLORS = {
+        new Color(112, 128, 144), // Pedra ardósia
+        new Color(169, 169, 169), // Cinza escuro
+        new Color(105, 105, 105), // Cinza fosco
+        // Adicione mais cores aqui se desejar
+    };
+
     private Vector position; // Posição da partícula
     private Vector velocity; // Velocidade da partícula
     private Vector force;    // Força total agindo sobre a partícula
 
     public StoneParticle() {
-        super("Stone", Color.GRAY);
+        super("Stone", STONE_COLORS[new Random().nextInt(STONE_COLORS.length)]);
         
         this.velocity = new Vector(0, 0);
         this.force = new Vector(0, 0);
