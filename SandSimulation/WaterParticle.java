@@ -14,8 +14,38 @@ class WaterParticle extends Particle{
         g.setColor(color);
         g.fillRect(x, y, size, size); // Preenche o quadrado com a cor da partícula
     }
-
     @Override
+    public void update(Particle[][] grid, int x, int y) {
+        int gridWidth = grid.length;
+        int gridHeight = grid[0].length;
+    
+        int maxFallDistance = 1; // Define a distância máxima que a partícula pode cair
+        int fallDistance = 0;
+    
+        // Procura pela maior distância de queda possível dentro do limite
+        for (int i = 1; i <= maxFallDistance; i++) {
+            if (y + i < gridHeight && grid[x][y + i] == null) {
+                fallDistance = i;
+            } else {
+                break; // Interrompe se encontrar uma célula ocupada
+            }
+        }
+    
+        if (fallDistance > 0) {
+            // Mover a partícula para baixo se possível
+            grid[x][y + fallDistance] = this;
+            grid[x][y] = null;
+        } else {
+            // Se não puder cair, tente mover-se horizontalmente
+            int dir = random.nextBoolean() ? 1 : -1;
+            if (x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y] == null) {
+                grid[x + dir][y] = this;
+                grid[x][y] = null;
+            }
+        }
+    }
+    
+     /*@Override
     public void update(Particle[][] grid, int x, int y) {
         int gridWidth = grid.length;
         int gridHeight = grid[0].length;
@@ -56,7 +86,8 @@ class WaterParticle extends Particle{
             return true; // Movimento foi bem-sucedido
         }
         return false; // Movimento falhou
-    }
+    }*/
+
 }
 
     // Métodos para lidar com calor e explosão são omitidos para simplificar

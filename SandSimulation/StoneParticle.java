@@ -1,10 +1,17 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Vector;
 
 public class StoneParticle extends Particle {
+    private Vector position; // Posição da partícula
+    private Vector velocity; // Velocidade da partícula
+    private Vector force;    // Força total agindo sobre a partícula
 
     public StoneParticle() {
         super("Stone", Color.GRAY);
+        
+        this.velocity = new Vector(0, 0);
+        this.force = new Vector(0, 0);
         //TODO Auto-generated constructor stub
     }
 
