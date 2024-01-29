@@ -29,43 +29,64 @@ class WaterParticle extends Particle{
         int gridWidth = grid.length;
         int gridHeight = grid[0].length;
         Random random = new Random();
-
-        // Primeiro, tente mover-se para baixo, aumentando a velocidade
-        boolean movedDown = false;
-        for (int i = 1; i <= Math.min(velocity, MAX_VELOCITY); i++) {
-            if (y + i < gridHeight && grid[x][y + i] == null) {
-                grid[x][y + i] = this;
+    
+        // Verifica se não está na parte inferior do grid
+        if (y < gridHeight - 1) {
+            boolean moved = false;
+    
+            // Verifica a célula diretamente abaixo
+            if (grid[x][y + 1] == null) {
+                grid[x][y + 1] = this;
                 grid[x][y] = null;
-                y = y + i; // Atualiza a posição atual da partícula
-                movedDown = true;
-                break;
+                moved = true;
+            } else {
+                // Decide aleatoriamente cair para a esquerda ou para a direita
+                int dir = random.nextBoolean() ? 1 : -1;
+    
+                // Verifica se a célula diagonal na direção escolhida está disponível
+                if (x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y + 1] == null) {
+                    grid[x + dir][y + 1] = this;
+                    grid[x][y] = null;
+                    moved = true;
+                }
+                // Tenta a direção oposta se a primeira escolha não estiver disponível
+                else if (x - dir >= 0 && x - dir < gridWidth && grid[x - dir][y + 1] == null) {
+                    grid[x - dir][y + 1] = this;
+                    grid[x][y] = null;
+                    moved = true;
+                }
+            }
+    
+            // Se a partícula não pôde se mover para baixo ou diagonalmente, tenta a disseminação
+            if (!moved) {
+                if (liquidSpread(grid, x, y)) {
+                    grid[x][y] = null;
+                } else {
+                    grid[x][y] = this;
+                }
             }
         }
-        if (movedDown) {
-            velocity = Math.min(velocity + 1, MAX_VELOCITY);
-            return;
-        } else {
-            velocity = 1; // Reseta a velocidade se não se moveu para baixo
-        }
-
-        // Tente mover-se lateralmente ou diagonalmente com escolha aleatória da direção
-        int[] directions = random.nextBoolean() ? new int[]{1, -1} : new int[]{-1, 1};
-        for (int dir : directions) {
-            // Movimento lateral
-            if (x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y] == null) {
-                grid[x + dir][y] = this;
+    }
+    public boolean liquidSpread(Particle[][] grid, int x, int y) {
+        int gridWidth = grid.length;
+        int gridHeight = grid[0].length;
+        Random random = new Random();
+    
+        // Gere um número aleatório entre -2 e 2 (inclusive)
+        //int direction = random.nextInt(5) - 2;
+        int direction = random.nextInt(11) - 5;
+        // Verifique se a nova posição está dentro dos limites da grade
+        int newX = x + direction;
+        if (newX >= 0 && newX < gridWidth) {
+            // Verifique se a célula na nova posição está vazia (null)
+            if (grid[newX][y] == null) {
+                // Mova a partícula líquida para a nova posição
+                grid[newX][y] = this;
                 grid[x][y] = null;
-                return;
-            }
-
-            // Movimento diagonal
-            if (y < gridHeight - 1 && x + dir >= 0 && x + dir < gridWidth && grid[x + dir][y + 1] == null) {
-                grid[x + dir][y + 1] = this;
-                grid[x][y] = null;
-                return;
+                return true;
             }
         }
-        
+        return false;
     }
 
     
