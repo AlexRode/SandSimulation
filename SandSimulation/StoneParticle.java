@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.Vector;
 
 
-public class StoneParticle extends Solid {
+public class StoneParticle extends Solid implements Destructible{
 
    
     private static final Color[] STONE_COLORS = {

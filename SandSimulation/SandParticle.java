@@ -7,7 +7,7 @@ import java.util.Random;
 
 
 
-public class SandParticle extends Solid {
+public class SandParticle extends Solid implements Destructible{
     
 
     private static final Color[] SAND_COLORS = {

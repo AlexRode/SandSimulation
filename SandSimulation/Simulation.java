@@ -146,7 +146,7 @@ private void configureKeyBindings() {
         keyToParticleMap.put(KeyEvent.VK_4, new SmokeParticle());
         keyToParticleMap.put(KeyEvent.VK_0, new Eraser());
         keyToParticleMap.put(KeyEvent.VK_A, new AcidParticle());
-        keyToParticleMap.put(KeyEvent.VK_S, new SeedBamboo());
+        //keyToParticleMap.put(KeyEvent.VK_S, new SeedBamboo());
 
 
         // Configura KeyBindings para cada entrada no mapa
@@ -291,9 +291,9 @@ private void configureKeyBindings() {
                                     grid[newX][newY] = new SmokeParticle();
                                 }  else if (selectedParticleType instanceof AcidParticle) {
                                     grid[newX][newY] = new AcidParticle();
-                                }  else if (selectedParticleType instanceof SeedBamboo) {
-                                    grid[newX][newY] = new SeedBamboo();
-                                } 
+                                }  //else if (selectedParticleType instanceof SeedBamboo) {
+                                    //grid[newX][newY] = new SeedBamboo();
+                                //} 
                                 // Adicione outras condições para diferentes tipos de partículas
                             }
                         }
