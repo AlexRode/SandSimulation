@@ -1,9 +1,22 @@
+
+
 import javax.swing.*;
+
+
+
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Simulation extends JFrame {
+
+    private long lastTimeCheck = System.nanoTime();
+    private int frameCount = 0;
+    private double fps = 0;
+
+    
     private final int width = 800;  // Largura do canvas
     private final int height = 600; // Altura do canvas
     public final int gridSize = 5; // Tamanho de cada célula do grid
@@ -13,16 +26,17 @@ public class Simulation extends JFrame {
     private Point mousePosition = null;
     private Timer addParticleTimer;
     private int addParticleTimerDelay = 100;
-    private int timevelocity = 25;
+    private int timevelocity = 10; //60fps +/-
     private int addAreaSize = 2;
 
-    private JSlider radiusSlider;
-    private JSlider fillSlider;
-    private JLabel radiusLabel;
-    private JLabel Numelements;
+    //private JLabel radiusLabel;
+    //private JLabel numElements;
+    //private JLabel FPSLabel;
 
     private int addAreaRadius = 7; // Raio do círculo de adição
+    
     private double fillPercentage = 0.15; // % de preenchimento
+    
     private Random rand = new Random();
 
     
@@ -31,81 +45,63 @@ public class Simulation extends JFrame {
 
 
 public Simulation() {
-    //setLayout(new BorderLayout()); // Mudança para BorderLayou 
-/* 
-    JPanel sliderPanel = new JPanel(new FlowLayout()); // Painel para os sliders
-    radiusSlider = new JSlider(JSlider.HORIZONTAL, 1, 10, addAreaRadius);
-    radiusSlider.addChangeListener(e -> {
-        JSlider source = (JSlider)e.getSource();
-        if (!source.getValueIsAdjusting()) {
-            addAreaRadius = source.getValue();
-            System.out.println("Raio atualizado para: " + addAreaRadius); // Saída de log para depuração
-        }
-    });
-    // Configurações do radiusSlider...
-    fillSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int)(fillPercentage * 100));
-    // Configurações do fillSlider...
-    fillSlider.addChangeListener(e -> {
-        JSlider source = (JSlider)e.getSource();
-        if (!source.getValueIsAdjusting()) {
-            fillPercentage = source.getValue() / 100.0;
-            System.out.println("Preenchimento atualizado para: " + fillPercentage); // Saída de log para depuração
-        
-        }
-        
-    });
+ 
+    
+GridPanel gridPanel = new GridPanel();
+gridPanel.setPreferredSize(new Dimension(width, height));
+this.add(gridPanel, BorderLayout.CENTER); // Adiciona o gridPanel no centro
 
-    // Adiciona os sliders ao painel de sliders
-    sliderPanel.add(new JLabel("Raio:"));
-    sliderPanel.add(radiusSlider);
-    sliderPanel.add(new JLabel("Preenchimento:"));
-    sliderPanel.add(fillSlider);
+//radiusLabel = new JLabel("Raio (ctrl + ou -): " + addAreaRadius +"  Dispersão (shift + ou -): " + fillPercentage); 
+//this.add(radiusLabel, BorderLayout.PAGE_END);
 
-    // Adiciona o painel de sliders ao JFrame na parte superior
-    this.add(sliderPanel, BorderLayout.PAGE_START);
+/*JPanel topPanel = new JPanel(new BorderLayout()); // Painel no topo que combina botões e rótulos
 
+JPanel buttonPanel = new JPanel(new FlowLayout());
+
+/*JButton sandButton = new JButton("Areia");
+sandButton.addActionListener(e -> selectedParticleType = new SandParticle());
+
+JButton waterButton = new JButton("Água");
+waterButton.addActionListener(e -> selectedParticleType = new WaterParticle());
+JButton stoneButton = new JButton("Pedra");
+stoneButton.addActionListener(e -> selectedParticleType = new StoneParticle());
+JButton smokeButton = new JButton("Fumo");
+smokeButton.addActionListener(e -> selectedParticleType = new SmokeParticle());
+JButton eraserButton = new JButton("Borracha");
+eraserButton.addActionListener(e -> selectedParticleType = new Eraser());
+
+
+//buttonPanel.add(sandButton);
+buttonPanel.add(waterButton);
+buttonPanel.add(stoneButton);
+buttonPanel.add(smokeButton);
+buttonPanel.add(eraserButton);
+
+
+JButton clearButton = new JButton("Apagar Tudo");
+clearButton.addActionListener(e -> clearGrid());
+buttonPanel.add(clearButton);
+
+topPanel.add(buttonPanel, BorderLayout.CENTER);
 */
+//JPanel labelPanel = new JPanel(new FlowLayout());
+//numElements = new JLabel("0-ERASER    1-SAND     2-WATER     3-STONE    4-SMOKE  ");
+//FPSLabel = new JLabel("FPS: "+fps);
 
-    GridPanel gridPanel = new GridPanel();
-    gridPanel.setPreferredSize(new Dimension(width, height));
-    this.add(gridPanel, BorderLayout.CENTER); // Adiciona o gridPanel no centro
-    
-    radiusLabel = new JLabel("Raio (ctrl + ou -): " + addAreaRadius +"  Dispersão (shift + ou -): " + fillPercentage); 
-    this.add(radiusLabel, BorderLayout.PAGE_END);
-    
-    Numelements =  new JLabel("1-SAND  2-WATER   3-STONE"); 
-    this.add(Numelements, BorderLayout.PAGE_START);
+//labelPanel.add(numElements);
+//labelPanel.add(FPSLabel);
+//FPSLabel.setBounds(10, 10, 100, 20);
+//topPanel.add(labelPanel, BorderLayout.PAGE_END);
 
-    pack();
-    setLocationRelativeTo(null);
-    setVisible(true);
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                keyPressedControls(e);
-                switch (e.getKeyCode()) {
-                                       
-                    case KeyEvent.VK_1:
-                    selectedParticleType = new SandParticle(); // Seleciona SAND
-                        break;
-                    case KeyEvent.VK_2:
-                    selectedParticleType = new WaterParticle(); // Seleciona WATER
-                        break;
-                    case KeyEvent.VK_3:
-                    selectedParticleType = new StoneParticle(); // Seleciona WATER
-                        break;
-                    // Adicione mais casos se tiver mais tipos de partículas
-                }
-            }
-        });
-        setFocusable(true); // Para que o JFrame possa capturar eventos de teclado
-        requestFocusInWindow(); // Solicita foco para capturar eventos de teclado
-        startSimulation();
-    }
+//this.add(topPanel, BorderLayout.PAGE_START);
+this.createControlPanel();
+pack();
+setLocationRelativeTo(null);
+setVisible(true);
 
-    public void keyPressedControls(KeyEvent e) {
-        
-        // Verificar primeiro se o Control está pressionado
+addKeyListener(new KeyAdapter() {
+    @Override
+    public void keyPressed(KeyEvent e) {
         if (e.isControlDown()) {
             
             // Verificar se a tecla de mais está sendo pressionada
@@ -114,23 +110,68 @@ public Simulation() {
             }
             // Verificar se a tecla de menos está sendo pressionada
             else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
-                addAreaRadius -= 2; // Diminuir o raio
+                addAreaRadius = Math.max(addAreaRadius - 2, 0); // Diminuir o raio
             }
         }else if(e.isShiftDown()){
             if (e.getKeyCode() == KeyEvent.VK_PLUS) {               
                 fillPercentage += 0.05;            
         } else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
-                fillPercentage -= 0.05; 
+            fillPercentage = Math.min(fillPercentage + 0.05, 1.0);
         }
         }
-        radiusLabel.setText("Raio (ctrl + ou -): " + addAreaRadius +"  Dispersão (shift + ou -): " + fillPercentage);
-        radiusLabel.revalidate();
-        radiusLabel.repaint();
+      //  upadteradiuslabel();
+       
+    }  
+    
+});
+setFocusable(true); // Para que o JFrame possa capturar eventos de teclado
+requestFocusInWindow(); // Solicita foco para capturar eventos de teclado
+startSimulation();
+
+configureKeyBindings();
+
+}
+//private void upadteradiuslabel() {
+    //radiusLabel.setText("Raio (ctrl + ou -): " + addAreaRadius +"  Dispersão (shift + ou -): " + fillPercentage);
+    //radiusLabel.revalidate();
+  //  radiusLabel.repaint();
+//}
+
+private void configureKeyBindings() {
+        // Mapa das teclas para as partículas correspondentes
+        Map<Integer, Particle> keyToParticleMap = new HashMap<>();
+        keyToParticleMap.put(KeyEvent.VK_1, new SandParticle());
+        keyToParticleMap.put(KeyEvent.VK_2, new WaterParticle());
+        keyToParticleMap.put(KeyEvent.VK_3, new StoneParticle());
+        keyToParticleMap.put(KeyEvent.VK_4, new SmokeParticle());
+        keyToParticleMap.put(KeyEvent.VK_0, new Eraser());
+        keyToParticleMap.put(KeyEvent.VK_A, new AcidParticle());
+        keyToParticleMap.put(KeyEvent.VK_S, new SeedBamboo());
+
+
+        // Configura KeyBindings para cada entrada no mapa
+        keyToParticleMap.forEach((key, particle) -> 
+            addKeyBinding(key, () -> selectedParticleType = particle));
     }
+    private void addKeyBinding(int keyCode, Runnable action) {
+        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getRootPane().getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(keyCode, 0), keyCode);
+        actionMap.put(keyCode, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+               // upadteradiuslabel();
+            }
+        });
+    }
+    
     public void startSimulation() {
         // Supondo que você tenha um timer para atualizar o estado das partículas
         Timer timer = new Timer(timevelocity, e -> updateParticles());
         timer.start();
+        
     }
 
     private void updateParticles() {
@@ -160,6 +201,25 @@ public Simulation() {
         // Re-desenha o grid com as novas posições das partículas
         GridPanel gridPanel = (GridPanel)getContentPane().getComponent(0);
         gridPanel.repaint();
+        frameCount++;
+
+        // Calcular o tempo decorrido desde a última verificação
+        long currentTime = System.nanoTime();
+        long timeElapsed = currentTime - lastTimeCheck;
+    
+        // Verificar se passou um segundo (1e9 nanossegundos)
+        if (timeElapsed >= 1e9) {
+            // Atualizar o FPS
+            fps = frameCount * (1e9 / timeElapsed);
+    
+            // Resetar para a próxima contagem
+            frameCount = 0;
+            lastTimeCheck = currentTime;
+            //ControlPanel.fpsLabel.setText("FPS: " + (int)fps);
+           // FPSLabel.setText("FPS: " + (int)fps);
+            // Imprimir o FPS
+            ///System.out.println("FPS: " + fps);
+        }
     }
 
 
@@ -211,14 +271,29 @@ public Simulation() {
                         // Verifica se as novas coordenadas estão dentro dos limites do grid
                         if (newX >= 0 && newX < grid.length && newY >= 0 && newY < grid[0].length) {
                             // Decide aleatoriamente se a célula será preenchida, com base na porcentagem de preenchimento
+                            if (selectedParticleType instanceof Eraser) {
+                                grid[newX][newY] = null; // Apaga a partícula existente
+                            }
+                           
                             if (grid[newX][newY] == null && rand.nextDouble() < fillPercentage) {
-                                if (selectedParticleType instanceof SandParticle) {
+                                
+                                if (selectedParticleType instanceof Eraser) {
+                                    grid[newX][newY] = null; // Apaga a partícula existente
+                                }
+
+                                else if (selectedParticleType instanceof SandParticle) {
                                     grid[newX][newY] = new SandParticle();
                                 } else if (selectedParticleType instanceof WaterParticle) {
                                     grid[newX][newY] = new WaterParticle();
                                 } else if (selectedParticleType instanceof StoneParticle) {
                                     grid[newX][newY] = new StoneParticle();
-                                }
+                                }  else if (selectedParticleType instanceof SmokeParticle) {
+                                    grid[newX][newY] = new SmokeParticle();
+                                }  else if (selectedParticleType instanceof AcidParticle) {
+                                    grid[newX][newY] = new AcidParticle();
+                                }  else if (selectedParticleType instanceof SeedBamboo) {
+                                    grid[newX][newY] = new SeedBamboo();
+                                } 
                                 // Adicione outras condições para diferentes tipos de partículas
                             }
                         }
@@ -244,8 +319,31 @@ public Simulation() {
         
     }
             
-        
-        
+    public void clearGrid() {
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                grid[x][y] = null;
+            }
+        }
+        repaint();
+    }
+    public void setSelectedParticleType(Particle particle) {
+        selectedParticleType = particle;
+    }
+    
+    private void createControlPanel() {
+        ControlPanel controlPanel = new ControlPanel(this);
+        this.add(controlPanel, BorderLayout.PAGE_START);
+    }
+    public int getAddAreaRadius() {
+        return addAreaRadius;
+    }
+    public double getFillPercentage() {
+        return fillPercentage;
+    }
+    public double getFps() {
+        return fps;
+    }
         public static void main(String[] args) {
             SwingUtilities.invokeLater(Simulation::new);
         }

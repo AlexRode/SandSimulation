@@ -5,11 +5,11 @@ abstract class Particle {
     // Propriedades comuns, como cor
     protected String name;
     protected Color color;
-
+    public double lateralDispersion ;
     // Construtor
-    public Particle(String name, Color color) {
+    public Particle(Color color) {
         this.color = color;
-        this.name=name;
+        
     }
 
     // Método abstrato para desenhar a partícula
