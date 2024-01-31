@@ -1,9 +1,12 @@
+package scr.Particles.Gas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import scr.Particles.Particle;
 
 
 
@@ -34,7 +37,7 @@ public void update(Particle[][] grid, int x, int y) {
     Random random = new Random();
 
     // Verifica se não está na parte inferior do grid
-    if (y >0) {
+    if (y > 0) {
         // Calcula a amplitude máxima do movimento lateral com base em lateralDispersion
         int lateralRange = (int) Math.round(lateralDispersion * 2);
 

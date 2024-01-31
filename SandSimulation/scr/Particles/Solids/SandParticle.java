@@ -1,9 +1,15 @@
-
+package scr.Particles.Solids;
 
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
+
+import scr.utils.Destructible;
+
+
+
+
 
 
 

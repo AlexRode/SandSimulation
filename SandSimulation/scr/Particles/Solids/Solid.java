@@ -1,5 +1,10 @@
+package scr.Particles.Solids;
+
 import java.awt.Color;
+
 import java.util.Random;
+
+import scr.Particles.Particle;
 
 public abstract class Solid extends Particle {
     //protected double lateralDispersion ; // Dispersão lateral
@@ -14,6 +19,10 @@ public void update(Particle[][] grid, int x, int y) {
     int gridHeight = grid[0].length;
     Random random = new Random();
 
+    
+    
+    
+
     // Verifica se não está na parte inferior do grid
     if (y < gridHeight - 1) {
         // Primeiro, tenta mover para baixo
@@ -21,7 +30,9 @@ public void update(Particle[][] grid, int x, int y) {
             grid[x][y + 1] = this;
             grid[x][y] = null;
             return;
+            
         }
+        
 
         // Se não puder mover para baixo, considera movimento lateral
         int lateralDirection = random.nextBoolean() ? 1 : -1;

@@ -1,5 +1,8 @@
+package scr.Particles.Liquids;
 import java.awt.Color;
 import java.util.Random;
+
+import scr.Particles.Particle;
 
 
 

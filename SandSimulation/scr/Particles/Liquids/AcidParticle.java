@@ -1,8 +1,12 @@
+package scr.Particles.Liquids;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
-class AcidParticle extends Liquid {
+import scr.Particles.Particle;
+import scr.utils.Destructible;
+
+public class AcidParticle extends Liquid {
     private int lifetime = 1; // Tempo de vida do ácido antes de desaparecer
     private int destructionCapacity = 5; // Capacidade de destruir outras partículas
     private static final double SELF_DESTRUCTION_PROBABILITY = 0.1; // 10% de chance de autodestruição

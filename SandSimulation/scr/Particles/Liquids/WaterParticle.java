@@ -1,10 +1,11 @@
+package scr.Particles.Liquids;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
 
 
-class WaterParticle extends Liquid{
+public class WaterParticle extends Liquid{
     int velocity = 1; // A velocidade inicial da partícula de água
     static final int MAX_VELOCITY = 3; // Velocidade máxima de queda
     private static final Color[] WATER_COLORS = {

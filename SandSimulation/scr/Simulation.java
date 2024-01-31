@@ -1,8 +1,14 @@
-
+package scr;
 
 import javax.swing.*;
 
-
+import scr.Particles.Eraser;
+import scr.Particles.Particle;
+import scr.Particles.Gas.SmokeParticle;
+import scr.Particles.Liquids.AcidParticle;
+import scr.Particles.Liquids.WaterParticle;
+import scr.Particles.Solids.SandParticle;
+import scr.Particles.Solids.StoneParticle;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -39,7 +45,7 @@ public class Simulation extends JFrame {
     
     private Random rand = new Random();
 
-    
+    private ControlPanel controlPanel;
     
     public Particle[][] grid = new Particle[width/gridSize][height/gridSize];
 
@@ -94,7 +100,8 @@ topPanel.add(buttonPanel, BorderLayout.CENTER);
 //topPanel.add(labelPanel, BorderLayout.PAGE_END);
 
 //this.add(topPanel, BorderLayout.PAGE_START);
-this.createControlPanel();
+configureKeyBindings();
+createControlPanel();
 pack();
 setLocationRelativeTo(null);
 setVisible(true);
@@ -128,7 +135,7 @@ setFocusable(true); // Para que o JFrame possa capturar eventos de teclado
 requestFocusInWindow(); // Solicita foco para capturar eventos de teclado
 startSimulation();
 
-configureKeyBindings();
+//configureKeyBindings();
 
 }
 //private void upadteradiuslabel() {
@@ -138,6 +145,7 @@ configureKeyBindings();
 //}
 
 private void configureKeyBindings() {
+  
         // Mapa das teclas para as partículas correspondentes
         Map<Integer, Particle> keyToParticleMap = new HashMap<>();
         keyToParticleMap.put(KeyEvent.VK_1, new SandParticle());
@@ -201,25 +209,25 @@ private void configureKeyBindings() {
         // Re-desenha o grid com as novas posições das partículas
         GridPanel gridPanel = (GridPanel)getContentPane().getComponent(0);
         gridPanel.repaint();
-        frameCount++;
-
-        // Calcular o tempo decorrido desde a última verificação
         long currentTime = System.nanoTime();
         long timeElapsed = currentTime - lastTimeCheck;
     
-        // Verificar se passou um segundo (1e9 nanossegundos)
+        // Se mais de um segundo passou, atualize os FPS.
         if (timeElapsed >= 1e9) {
-            // Atualizar o FPS
             fps = frameCount * (1e9 / timeElapsed);
     
-            // Resetar para a próxima contagem
+            System.out.println("FPS Calculado: " + fps); // Imprime o valor calculado de FPS para teste
+           
+            if (controlPanel != null) {
+                SwingUtilities.invokeLater(() -> controlPanel.updateFpsLabel(fps));
+            }
             frameCount = 0;
             lastTimeCheck = currentTime;
-            //ControlPanel.fpsLabel.setText("FPS: " + (int)fps);
-           // FPSLabel.setText("FPS: " + (int)fps);
-            // Imprimir o FPS
-            ///System.out.println("FPS: " + fps);
+           
         }
+        frameCount++;
+       
+        //calculateFps();
     }
 
 
@@ -300,6 +308,7 @@ private void configureKeyBindings() {
                     }
                 }
             }
+            
             repaint();
         }
         @Override
@@ -318,7 +327,19 @@ private void configureKeyBindings() {
         }
         
     }
-            
+    private double calculateFps() {
+        long currentTime = System.nanoTime();
+        long timeElapsed = currentTime - lastTimeCheck;
+    
+        if (timeElapsed >= 1e9) {
+            fps = frameCount * (1e9 / timeElapsed);
+            frameCount = 0;
+            lastTimeCheck = currentTime;
+        }
+    
+        frameCount++;
+        return fps;
+    }
     public void clearGrid() {
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
@@ -335,6 +356,8 @@ private void configureKeyBindings() {
         ControlPanel controlPanel = new ControlPanel(this);
         this.add(controlPanel, BorderLayout.PAGE_START);
     }
+    
+
     public int getAddAreaRadius() {
         return addAreaRadius;
     }

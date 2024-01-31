@@ -1,3 +1,4 @@
+package scr.Particles.Solids;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -5,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+
+import scr.utils.Destructible;
 
 
 public class StoneParticle extends Solid implements Destructible{
