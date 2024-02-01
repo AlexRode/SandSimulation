@@ -25,5 +25,8 @@ public abstract class Particle {
         }
         return null; // Fora dos limit
     }
+    public void performActionWithNeighbor(Particle[][] grid, int x, int y) {
+        
+    }
 }
 

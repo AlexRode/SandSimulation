@@ -5,6 +5,7 @@ import javax.swing.border.Border;
 
 import scr.Particles.Eraser;
 import scr.Particles.Gas.SmokeParticle;
+import scr.Particles.Liquids.AcidParticle;
 import scr.Particles.Liquids.WaterParticle;
 import scr.Particles.Solids.SandParticle;
 import scr.Particles.Solids.StoneParticle;
@@ -19,11 +20,12 @@ public class ControlPanel extends JPanel {
         setLayout(new FlowLayout());
 
         // Adicionando botões estilizados ao painel
-        add(createStyledButton("1-Areia", () -> simulation.setSelectedParticleType(new SandParticle()), simulation));
-        add(createStyledButton("2-Água", () -> simulation.setSelectedParticleType(new WaterParticle()), simulation));
-        add(createStyledButton("3-Pedra", () -> simulation.setSelectedParticleType(new StoneParticle()), simulation));
-        add(createStyledButton("4-Fumo", () -> simulation.setSelectedParticleType(new SmokeParticle()), simulation));
-        add(createStyledButton("0-Borracha", () -> simulation.setSelectedParticleType(new Eraser()), simulation));
+        add(createStyledButton("0-Eraser", () -> simulation.setSelectedParticleType(new Eraser()), simulation));
+        add(createStyledButton("1-Sand", () -> simulation.setSelectedParticleType(new SandParticle()), simulation));
+        add(createStyledButton("2-Water", () -> simulation.setSelectedParticleType(new WaterParticle()), simulation));
+        add(createStyledButton("3-Stone", () -> simulation.setSelectedParticleType(new StoneParticle()), simulation));
+        add(createStyledButton("4-Smoke", () -> simulation.setSelectedParticleType(new SmokeParticle()), simulation));
+        add(createStyledButton("A-Acid", () -> simulation.setSelectedParticleType(new AcidParticle()), simulation));
 
         // Botão para limpar o grid
         JButton clearButton = createStyledButton("C-Clear", simulation::clearGrid, simulation);

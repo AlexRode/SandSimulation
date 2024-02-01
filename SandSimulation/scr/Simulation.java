@@ -7,6 +7,7 @@ import scr.Particles.Particle;
 import scr.Particles.Gas.SmokeParticle;
 import scr.Particles.Liquids.AcidParticle;
 import scr.Particles.Liquids.WaterParticle;
+import scr.Particles.Seeds.SeedTree;
 import scr.Particles.Solids.SandParticle;
 import scr.Particles.Solids.StoneParticle;
 
@@ -39,7 +40,7 @@ public class Simulation extends JFrame {
     //private JLabel numElements;
     //private JLabel FPSLabel;
 
-    private int addAreaRadius = 7; // Raio do círculo de adição
+    private int addAreaRadius = 2; // Raio do círculo de adição
     
     private double fillPercentage = 0.15; // % de preenchimento
     
@@ -154,7 +155,7 @@ private void configureKeyBindings() {
         keyToParticleMap.put(KeyEvent.VK_4, new SmokeParticle());
         keyToParticleMap.put(KeyEvent.VK_0, new Eraser());
         keyToParticleMap.put(KeyEvent.VK_A, new AcidParticle());
-        //keyToParticleMap.put(KeyEvent.VK_S, new SeedBamboo());
+        keyToParticleMap.put(KeyEvent.VK_S, new SeedTree(5));
 
 
         // Configura KeyBindings para cada entrada no mapa
@@ -198,14 +199,24 @@ private void configureKeyBindings() {
             for (int y = 0; y < grid[0].length; y++) {
                 if (grid[x][y] != null) {
                     // Chama update para cada partícula, passando o novo grid e a posição da partícula
+                   
                     grid[x][y].update(newGrid, x, y);
+                    grid[x][y].performActionWithNeighbor(grid,x, y);
                 }
             }
         }
-    
+        /*for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                if (newGrid[x][y] != null) {
+                    // Chama performActionWithNeighbor para cada partícula não nula, passando o novo grid e a posição da partícula.
+                    newGrid[x][y].performActionWithNeighbor(newGrid, x, y);
+                }
+            }
+        }*/
+
         // Atualiza o grid principal para a nova configuração após o movimento das partículas
         grid = newGrid;
-    
+        repaint();
         // Re-desenha o grid com as novas posições das partículas
         GridPanel gridPanel = (GridPanel)getContentPane().getComponent(0);
         gridPanel.repaint();
@@ -299,9 +310,9 @@ private void configureKeyBindings() {
                                     grid[newX][newY] = new SmokeParticle();
                                 }  else if (selectedParticleType instanceof AcidParticle) {
                                     grid[newX][newY] = new AcidParticle();
-                                }  //else if (selectedParticleType instanceof SeedBamboo) {
-                                    //grid[newX][newY] = new SeedBamboo();
-                                //} 
+                                }  else if (selectedParticleType instanceof SeedTree) {
+                                    grid[newX][newY] = new SeedTree(5);
+                                } 
                                 // Adicione outras condições para diferentes tipos de partículas
                             }
                         }
