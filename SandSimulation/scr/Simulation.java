@@ -40,7 +40,7 @@ public class Simulation extends JFrame {
     //private JLabel numElements;
     //private JLabel FPSLabel;
 
-    private int addAreaRadius = 2; // Raio do círculo de adição
+    private int addAreaRadius = 1; // Raio do círculo de adição
     
     private double fillPercentage = 0.15; // % de preenchimento
     
@@ -155,7 +155,7 @@ private void configureKeyBindings() {
         keyToParticleMap.put(KeyEvent.VK_4, new SmokeParticle());
         keyToParticleMap.put(KeyEvent.VK_0, new Eraser());
         keyToParticleMap.put(KeyEvent.VK_A, new AcidParticle());
-        keyToParticleMap.put(KeyEvent.VK_S, new SeedTree(5));
+        keyToParticleMap.put(KeyEvent.VK_S, new SeedTree());
 
 
         // Configura KeyBindings para cada entrada no mapa
@@ -311,9 +311,9 @@ private void configureKeyBindings() {
                                 }  else if (selectedParticleType instanceof AcidParticle) {
                                     grid[newX][newY] = new AcidParticle();
                                 }  else if (selectedParticleType instanceof SeedTree) {
-                                    grid[newX][newY] = new SeedTree(5);
+                                    grid[newX][newY] = new SeedTree();
                                 } 
-                                // Adicione outras condições para diferentes tipos de partículas
+                                
                             }
                         }
                     }
