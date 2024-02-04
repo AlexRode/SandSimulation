@@ -2,7 +2,10 @@ package scr.Particles.Seeds;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
 
 import scr.Particles.Particle;
 import scr.Particles.Solids.SandParticle;
@@ -14,7 +17,9 @@ public class SeedTree extends Solid{
    
     private static Random random = new Random(); 
 
-    
+     private double angleIncrement = 25.0; // Ângulo de rotação de 25 graus
+    private double currentAngle = -90.0; // Inicia apontando para cima (em graus)
+
     private int totalGrowHeight=10;
 
      private int currenttotalGrowHeight=0;
@@ -27,52 +32,80 @@ public class SeedTree extends Solid{
         
     };   
 
+     private String currentLSystemString;
+    private final String axiom = "X";
+    private final Map<Character, String> lSystemRules;
+
     public SeedTree() {
         super(Seed_COLORS[random.nextInt(Seed_COLORS.length)]);
-       // this.state = 0;
-        //this.growthCounter = 0;
-        //this.totalGrowHeight = totalGrowHeight;
+        lSystemRules = new HashMap<>();
+        lSystemRules.put('F', "FF");
+        lSystemRules.put('X', "F-[[X]+X]+F[+FX]-X");
+        
+        // Gere a string L-System com base nas iterações desejadas
+        currentLSystemString = generateLSystemString(5); // Número de iterações
     }
 
+    private String generateLSystemString(int iterations) {
+        String result = axiom;
+        for (int i = 0; i < iterations; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (char c : result.toCharArray()) {
+                sb.append(lSystemRules.getOrDefault(c, String.valueOf(c)));
+            }
+            result = sb.toString();
+        }
+        return result;
+    }
 
     @Override
     public void draw(Graphics g, int x, int y, int size) {
         g.setColor(color);
         g.fillRect(x, y, size, size); // Preenche o quadrado com a cor da partícula
     }
-    @Override
-public void update(Particle[][] grid, int x, int y) {
-    // Verifica se a árvore já completou seu crescimento total, incluindo ramos.
-    if (this.state == 2) {
-        return;
-    }
+   @Override
+    public void update(Particle[][] grid, int x, int y) {
+        // Criação de uma pilha para armazenar estados (para ramificações)
+        Stack<TurtleState> stateStack = new Stack<>();
+        TurtleState currentState = new TurtleState(x, y, 0, -1); // Iniciar com crescimento para cima
 
-    // Fase de crescimento do caule.
-    if (this.state == 0 && this.currentGrowHeight < MAX_GROW_HEIGHT) {
-        if (y > 0 && grid[x][y - 1] == null) {
-            // Ao crescer, substitui a posição atual por uma parte do caule.
-            grid[x][y] = new SeedTree(); // Utiliza Plant para representar o caule.
-            // Move a "semente" (agora parte do caule) para cima.
-            grid[x][y - 1] = this;
-            this.currentGrowHeight++;
-        } else {
-           // for(int i = 0; i<1;i++){
-            //grid[x][y] = new Plant();
-            //grid[x+i][y - 1] = this;
-            // Se encontrar um obstáculo ou atingir o topo, prepara para crescer os ramos.
-            //}
-            this.state = 1;
-
+        // Iterar sobre a string do L-System e interpretar os comandos
+        for (char c : currentLSystemString.toCharArray()) {
+            switch (c) {
+                case 'F': // Move para frente na direção atual
+                    int newX = currentState.x + currentState.dirX;
+                    int newY = currentState.y + currentState.dirY;
+                    if (newX >= 0 && newX < grid.length && newY >= 0 && newY < grid[0].length) {
+                        if (grid[newX][newY] == null) {
+                            grid[newX][newY] = new SeedTree(); // Novo ramo
+                        }
+                        currentState.x = newX;
+                        currentState.y = newY;
+                    }
+                    break;
+                case '+': // Gira para a direita
+                    // Rotação simples por 90 graus
+                    int temp = currentState.dirX;
+                    currentState.dirX = -currentState.dirY;
+                    currentState.dirY = temp;
+                    break;
+                case '-': // Gira para a esquerda
+                    // Rotação simples por 90 graus
+                    temp = currentState.dirX;
+                    currentState.dirX = currentState.dirY;
+                    currentState.dirY = -temp;
+                    break;
+                case '[': // Salva o estado atual (ramificação começa)
+                    stateStack.push(new TurtleState(currentState.x, currentState.y, currentState.dirX, currentState.dirY));
+                    break;
+                case ']': // Restaura o estado anterior (ramificação termina)
+                    if (!stateStack.isEmpty()) {
+                        currentState = stateStack.pop();
+                    }
+                    break;
+            }
         }
     }
-
-    // Fase de crescimento dos ramos, após o caule atingir a altura máxima.
-    if (this.state == 1) {
-        // Tentativa de crescer ramos à esquerda e à direita.
-        growBranches(grid, x, y - this.currentGrowHeight + 1-10);
-        this.state = 2; // Marca o crescimento como completo após tentar crescer os ramos.
-    }
-}
 
 private void growBranches(Particle[][] grid, int x, int y) {
     // Determina a altura máxima que os ramos podem crescer.
@@ -92,12 +125,12 @@ private void growBranch(Particle[][] grid, int x, int y, int branchGrowHeight, i
     int HorizontalDirection = random.nextBoolean() ? -1 : 1;
     int ransposition = random.nextBoolean() ? -2 : 2;
 
-    int randomNum = random.nextInt(15)-5 ;//faz com que por vezes o for não funcione
-
+    int randomNum = random.nextInt(10)-5 ;//faz com que por vezes o for não funcione
+    int randomNum2 = random.nextInt(5)-5 ;
     for (int i = 1; i <= randomNum; i++) {
         int newX = x + i * direction ;
        // int newY = y + i * verticalDirection;
-       int newY = y + i *-1;
+       int newY = y + i *randomNum2;
         // Verifica se as novas coordenadas estão dentro dos limites do grid.
         if (newX >= 0 && newX < grid.length && newY >= 0 && newY < grid[0].length) {
             // Verifica se o espaço está disponível e, se sim, coloca um novo ramo.
@@ -109,7 +142,17 @@ private void growBranch(Particle[][] grid, int x, int y, int branchGrowHeight, i
 }
 
    
+class TurtleState {
+    int x, y;
+    int dirX, dirY; // Direção do crescimento
 
+    TurtleState(int x, int y, int dirX, int dirY) {
+        this.x = x;
+        this.y = y;
+        this.dirX = dirX;
+        this.dirY = dirY;
+    }
+}
     
 
     
