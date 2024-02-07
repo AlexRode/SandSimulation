@@ -34,11 +34,7 @@ public class Simulation extends JFrame {
     private Timer addParticleTimer;
     private int addParticleTimerDelay = 100;
     private int timevelocity = 10; //60fps +/-
-    private int addAreaSize = 2;
 
-    //private JLabel radiusLabel;
-    //private JLabel numElements;
-    //private JLabel FPSLabel;
 
     private int addAreaRadius = 1; // Raio do círculo de adição
     
@@ -58,49 +54,6 @@ GridPanel gridPanel = new GridPanel();
 gridPanel.setPreferredSize(new Dimension(width, height));
 this.add(gridPanel, BorderLayout.CENTER); // Adiciona o gridPanel no centro
 
-//radiusLabel = new JLabel("Raio (ctrl + ou -): " + addAreaRadius +"  Dispersão (shift + ou -): " + fillPercentage); 
-//this.add(radiusLabel, BorderLayout.PAGE_END);
-
-/*JPanel topPanel = new JPanel(new BorderLayout()); // Painel no topo que combina botões e rótulos
-
-JPanel buttonPanel = new JPanel(new FlowLayout());
-
-/*JButton sandButton = new JButton("Areia");
-sandButton.addActionListener(e -> selectedParticleType = new SandParticle());
-
-JButton waterButton = new JButton("Água");
-waterButton.addActionListener(e -> selectedParticleType = new WaterParticle());
-JButton stoneButton = new JButton("Pedra");
-stoneButton.addActionListener(e -> selectedParticleType = new StoneParticle());
-JButton smokeButton = new JButton("Fumo");
-smokeButton.addActionListener(e -> selectedParticleType = new SmokeParticle());
-JButton eraserButton = new JButton("Borracha");
-eraserButton.addActionListener(e -> selectedParticleType = new Eraser());
-
-
-//buttonPanel.add(sandButton);
-buttonPanel.add(waterButton);
-buttonPanel.add(stoneButton);
-buttonPanel.add(smokeButton);
-buttonPanel.add(eraserButton);
-
-
-JButton clearButton = new JButton("Apagar Tudo");
-clearButton.addActionListener(e -> clearGrid());
-buttonPanel.add(clearButton);
-
-topPanel.add(buttonPanel, BorderLayout.CENTER);
-*/
-//JPanel labelPanel = new JPanel(new FlowLayout());
-//numElements = new JLabel("0-ERASER    1-SAND     2-WATER     3-STONE    4-SMOKE  ");
-//FPSLabel = new JLabel("FPS: "+fps);
-
-//labelPanel.add(numElements);
-//labelPanel.add(FPSLabel);
-//FPSLabel.setBounds(10, 10, 100, 20);
-//topPanel.add(labelPanel, BorderLayout.PAGE_END);
-
-//this.add(topPanel, BorderLayout.PAGE_START);
 configureKeyBindings();
 createControlPanel();
 pack();
@@ -127,23 +80,19 @@ addKeyListener(new KeyAdapter() {
             fillPercentage = Math.min(fillPercentage + 0.05, 1.0);
         }
         }
-      //  upadteradiuslabel();
+     
        
     }  
     
 });
-setFocusable(true); // Para que o JFrame possa capturar eventos de teclado
-requestFocusInWindow(); // Solicita foco para capturar eventos de teclado
+setFocusable(true); 
+requestFocusInWindow(); 
 startSimulation();
 
-//configureKeyBindings();
+
 
 }
-//private void upadteradiuslabel() {
-    //radiusLabel.setText("Raio (ctrl + ou -): " + addAreaRadius +"  Dispersão (shift + ou -): " + fillPercentage);
-    //radiusLabel.revalidate();
-  //  radiusLabel.repaint();
-//}
+
 
 private void configureKeyBindings() {
   
@@ -177,15 +126,14 @@ private void configureKeyBindings() {
     }
     
     public void startSimulation() {
-        // Supondo que você tenha um timer para atualizar o estado das partículas
+      
         Timer timer = new Timer(timevelocity, e -> updateParticles());
         timer.start();
         
     }
 
     private void updateParticles() {
-        // Criando uma cópia do grid para não alterar o grid enquanto iteramos sobre ele
-        Particle[][] newGrid = new Particle[width / gridSize][height / gridSize];
+         Particle[][] newGrid = new Particle[width / gridSize][height / gridSize];
     
         // Copia todas as partículas para o novo grid
         for (int x = 0; x < grid.length; x++) {
