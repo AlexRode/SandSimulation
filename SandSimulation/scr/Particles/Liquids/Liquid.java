@@ -58,24 +58,38 @@ public abstract class Liquid extends Particle {
     }
     public boolean liquidSpread(Particle[][] grid, int x, int y) {
         int gridWidth = grid.length;
-        int gridHeight = grid[0].length;
         Random random = new Random();
     
-        // Gere um número aleatório entre -2 e 2 (inclusive)
-        //int direction = random.nextInt(5) - 2;
+        // Gera um número aleatório entre -5 e 5 (inclusive)
         int direction = random.nextInt(11) - 5;
-        // Verifique se a nova posição está dentro dos limites da grade
         int newX = x + direction;
-        if (newX >= 0 && newX < gridWidth) {
-            // Verifique se a célula na nova posição está vazia (null)
+    
+        // Ajusta newX para permanecer dentro dos limites da grade
+        newX = Math.max(0, Math.min(newX, gridWidth - 1));
+    
+        // Determina o passo (1 para direita ou -1 para esquerda) baseado na direção
+        int step = (newX > x) ? 1 : -1;
+    
+        // Verifica se há partícula no caminho antes de mover
+        boolean pathBlocked = false;
+        for (int i = x + step; i != newX + step; i += step) {
+            if (grid[i][y] != null) {
+                // Se encontrar uma partícula no caminho, define o caminho como bloqueado
+                pathBlocked = true;
+                break;
+            }
+        }
+    
+        if (!pathBlocked) {
+            // Se o caminho não estiver bloqueado, realiza o movimento
             if (grid[newX][y] == null) {
-                // Mova a partícula líquida para a nova posição
                 grid[newX][y] = this;
                 grid[x][y] = null;
                 return true;
             }
         }
-        return false;
+    
+        return false; // Não foi possível mover a partícula
     }
     
 }

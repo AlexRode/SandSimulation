@@ -41,16 +41,24 @@ public class SandParticle extends Solid implements Destructible{
     }
      @Override
     public void update(Particle[][] grid, int x, int y) {
-        super.update(grid, x, y); // Chama a implementação padrão de Solid
-        
-        // Agora, verificamos se há água abaixo para interagir
-        if (y < grid[0].length - 1 && grid[x][y + 1] instanceof WaterParticle) {
-            // Troca posição com a água
-            Particle temp = grid[x][y + 1];
+      
+    int gridHeight = grid[0].length;
+
+    // Verifica se não está na parte inferior do grid
+    if (y < gridHeight - 1) {
+        Particle below = grid[x][y + 1];
+
+        // Se a partícula abaixo é uma partícula de água, troca de lugar com ela
+        if (below instanceof WaterParticle) {
+            grid[x][y] = below;
             grid[x][y + 1] = this;
-            grid[x][y] = temp;
+        } else {
+            // Se não for água, executa o comportamento padrão de Solid
+            super.update(grid, x, y);
         }
     }
+}
+    
 
     @Override
     public void performActionWithNeighbor(Particle[][] grid, int x, int y) {

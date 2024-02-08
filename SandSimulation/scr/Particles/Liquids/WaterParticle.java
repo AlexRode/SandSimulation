@@ -9,7 +9,7 @@ public class WaterParticle extends Liquid{
     int velocity = 1; // A velocidade inicial da partícula de água
     static final int MAX_VELOCITY = 3; // Velocidade máxima de queda
     private static final Color[] WATER_COLORS = {
-        new Color(0, 191, 255, 128), // Azul claro com transparência
+        new Color(50, 191, 255, 128), // Azul claro com transparência
        // new Color(70, 130, 180, 128), // Azul aço com transparência
         new Color(135, 206, 235, 128), // Azul céu com transparência
         // Adicione mais cores aqui se desejar
