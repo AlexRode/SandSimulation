@@ -1,6 +1,5 @@
 package scr.Particles.Solids;
 
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
@@ -10,28 +9,22 @@ import scr.Particles.Liquids.Liquid;
 import scr.Particles.Liquids.WaterParticle;
 import scr.utils.Destructible;
 
-
-
-
-
-
-
-public class SandParticle extends Solid implements Destructible{
-    
+public class SandParticle extends Solid implements Destructible {
 
     private static final Color[] SAND_COLORS = {
-        new Color(194, 178, 128), // Bege
-        new Color(237, 201, 175), // Creme
-        new Color(213, 196, 161), // Castanho claro
-        //new Color(255, 255, 204), // Amarelo claro
-        new Color(255, 239, 153), // Amarelo dourado
-        // Adicione mais cores aqui se desejar
+            new Color(194, 178, 128), // Bege
+            new Color(237, 201, 175), // Creme
+            new Color(213, 196, 161), // Castanho claro
+            // new Color(255, 255, 204), // Amarelo claro
+            new Color(255, 239, 153), // Amarelo dourado
+            // Adicione mais cores aqui se desejar
     };
+
     public SandParticle() {
-        super( SAND_COLORS[new Random().nextInt(SAND_COLORS.length)]); // Cor específica para areia
- 
-       lateralDispersion = 2;
-        
+        super(SAND_COLORS[new Random().nextInt(SAND_COLORS.length)]); // Cor específica para areia
+
+        lateralDispersion = 2;
+
     }
 
     @Override
@@ -39,26 +32,26 @@ public class SandParticle extends Solid implements Destructible{
         g.setColor(color);
         g.fillRect(x, y, size, size); // Preenche o quadrado com a cor da partícula
     }
-     @Override
+
+    @Override
     public void update(Particle[][] grid, int x, int y) {
-      
-    int gridHeight = grid[0].length;
 
-    // Verifica se não está na parte inferior do grid
-    if (y < gridHeight - 1) {
-        Particle below = grid[x][y + 1];
+        int gridHeight = grid[0].length;
 
-        // Se a partícula abaixo é uma partícula de água, troca de lugar com ela
-        if (below instanceof WaterParticle) {
-            grid[x][y] = below;
-            grid[x][y + 1] = this;
-        } else {
-            // Se não for água, executa o comportamento padrão de Solid
-            super.update(grid, x, y);
+        // Verifica se não está na parte inferior do grid
+        if (y < gridHeight - 1) {
+            Particle below = grid[x][y + 1];
+
+            // Se a partícula abaixo é uma partícula de água, troca de lugar com ela
+            if (below instanceof WaterParticle) {
+                grid[x][y] = below;
+                grid[x][y + 1] = this;
+            } else {
+                // Se não for água, executa o comportamento padrão de Solid
+                super.update(grid, x, y);
+            }
         }
     }
-}
-    
 
     @Override
     public void performActionWithNeighbor(Particle[][] grid, int x, int y) {
@@ -69,8 +62,9 @@ public class SandParticle extends Solid implements Destructible{
             // Troca posição com a partícula líquida (areia afunda e líquido sobe)
             swapParticles(grid, x, y, x, y + 1);
         }
-        
-        // Após afundar, pode ser necessário verificar movimentos laterais ou outras ações
+
+        // Após afundar, pode ser necessário verificar movimentos laterais ou outras
+        // ações
         // Por exemplo, se ainda estiver em contato com líquidos
     }
 

@@ -1,9 +1,5 @@
 package scr.Particles.Seeds;
 
-import java.awt.Graphics;
-import java.awt.Color;
-import java.util.Stack;
-
 class State {
     int x, y;
     double angle;

@@ -23,79 +23,71 @@ public class Simulation extends JFrame {
     private int frameCount = 0;
     private double fps = 0;
 
-    
-    private final int width = 800;  // Largura do canvas
+    private final int width = 800; // Largura do canvas
     private final int height = 600; // Altura do canvas
     public final int gridSize = 5; // Tamanho de cada célula do grid
 
     private Particle selectedParticleType;
-    
+
     private Point mousePosition = null;
     private Timer addParticleTimer;
     private int addParticleTimerDelay = 100;
-    private int timevelocity = 10; //60fps +/-
-
+    private int timevelocity = 10; // 60fps +/-
 
     private int addAreaRadius = 1; // Raio do círculo de adição
-    
+
     private double fillPercentage = 0.15; // % de preenchimento
-    
+
     private Random rand = new Random();
 
     private ControlPanel controlPanel;
-    
-    public Particle[][] grid = new Particle[width/gridSize][height/gridSize];
 
+    public Particle[][] grid = new Particle[width / gridSize][height / gridSize];
 
-public Simulation() {
- 
-    
-GridPanel gridPanel = new GridPanel();
-gridPanel.setPreferredSize(new Dimension(width, height));
-this.add(gridPanel, BorderLayout.CENTER); // Adiciona o gridPanel no centro
+    public Simulation() {
 
-configureKeyBindings();
-createControlPanel();
-pack();
-setLocationRelativeTo(null);
-setVisible(true);
+        GridPanel gridPanel = new GridPanel();
+        gridPanel.setPreferredSize(new Dimension(width, height));
+        this.add(gridPanel, BorderLayout.CENTER); // Adiciona o gridPanel no centro
 
-addKeyListener(new KeyAdapter() {
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.isControlDown()) {
-            
-            // Verificar se a tecla de mais está sendo pressionada
-            if (e.getKeyCode() == KeyEvent.VK_PLUS) {               
-                    addAreaRadius += 2; // Aumentar o raio   
+        configureKeyBindings();
+        createControlPanel();
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.isControlDown()) {
+
+                    // Verificar se a tecla de mais está sendo pressionada
+                    if (e.getKeyCode() == KeyEvent.VK_PLUS) {
+                        addAreaRadius += 2; // Aumentar o raio
+                    }
+                    // Verificar se a tecla de menos está sendo pressionada
+                    else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+                        addAreaRadius = Math.max(addAreaRadius - 2, 0); // Diminuir o raio
+                    }
+                } else if (e.isShiftDown()) {
+                    if (e.getKeyCode() == KeyEvent.VK_PLUS) {
+                        fillPercentage += 0.05;
+                    } else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+                        fillPercentage = Math.min(fillPercentage + 0.05, 1.0);
+                    }
+                }
+
             }
-            // Verificar se a tecla de menos está sendo pressionada
-            else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
-                addAreaRadius = Math.max(addAreaRadius - 2, 0); // Diminuir o raio
-            }
-        }else if(e.isShiftDown()){
-            if (e.getKeyCode() == KeyEvent.VK_PLUS) {               
-                fillPercentage += 0.05;            
-        } else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
-            fillPercentage = Math.min(fillPercentage + 0.05, 1.0);
-        }
-        }
-     
-       
-    }  
-    
-});
-setFocusable(true); 
-requestFocusInWindow(); 
-startSimulation();
 
+        });
+        setFocusable(true);
+        requestFocusInWindow();
+        startSimulation();
 
+    }
 
-}
+    private void configureKeyBindings() {
 
-
-private void configureKeyBindings() {
-  
         // Mapa das teclas para as partículas correspondentes
         Map<Integer, Particle> keyToParticleMap = new HashMap<>();
         keyToParticleMap.put(KeyEvent.VK_1, new SandParticle());
@@ -106,11 +98,10 @@ private void configureKeyBindings() {
         keyToParticleMap.put(KeyEvent.VK_A, new AcidParticle());
         keyToParticleMap.put(KeyEvent.VK_S, new SeedTree());
 
-
         // Configura KeyBindings para cada entrada no mapa
-        keyToParticleMap.forEach((key, particle) -> 
-            addKeyBinding(key, () -> selectedParticleType = particle));
+        keyToParticleMap.forEach((key, particle) -> addKeyBinding(key, () -> selectedParticleType = particle));
     }
+
     private void addKeyBinding(int keyCode, Runnable action) {
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getRootPane().getActionMap();
@@ -120,83 +111,84 @@ private void configureKeyBindings() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 action.run();
-               // upadteradiuslabel();
+                // upadteradiuslabel();
             }
         });
     }
-    
+
     public void startSimulation() {
-      
+
         Timer timer = new Timer(timevelocity, e -> updateParticles());
         timer.start();
-        
+
     }
 
     private void updateParticles() {
-         Particle[][] newGrid = new Particle[width / gridSize][height / gridSize];
-    
+        Particle[][] newGrid = new Particle[width / gridSize][height / gridSize];
+
         // Copia todas as partículas para o novo grid
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
                 newGrid[x][y] = grid[x][y];
             }
         }
-    
+
         // Itera sobre todas as células do grid
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
                 if (grid[x][y] != null) {
-                    // Chama update para cada partícula, passando o novo grid e a posição da partícula
-                   
+                    // Chama update para cada partícula, passando o novo grid e a posição da
+                    // partícula
+
                     grid[x][y].update(newGrid, x, y);
-                    grid[x][y].performActionWithNeighbor(grid,x, y);
+                    grid[x][y].performActionWithNeighbor(grid, x, y);
                 }
             }
         }
-        /*for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[0].length; y++) {
-                if (newGrid[x][y] != null) {
-                    // Chama performActionWithNeighbor para cada partícula não nula, passando o novo grid e a posição da partícula.
-                    newGrid[x][y].performActionWithNeighbor(newGrid, x, y);
-                }
-            }
-        }*/
+        /*
+         * for (int x = 0; x < grid.length; x++) {
+         * for (int y = 0; y < grid[0].length; y++) {
+         * if (newGrid[x][y] != null) {
+         * // Chama performActionWithNeighbor para cada partícula não nula, passando o
+         * novo grid e a posição da partícula.
+         * newGrid[x][y].performActionWithNeighbor(newGrid, x, y);
+         * }
+         * }
+         * }
+         */
 
-        // Atualiza o grid principal para a nova configuração após o movimento das partículas
+        // Atualiza o grid principal para a nova configuração após o movimento das
+        // partículas
         grid = newGrid;
         repaint();
         // Re-desenha o grid com as novas posições das partículas
-        GridPanel gridPanel = (GridPanel)getContentPane().getComponent(0);
+        GridPanel gridPanel = (GridPanel) getContentPane().getComponent(0);
         gridPanel.repaint();
         long currentTime = System.nanoTime();
         long timeElapsed = currentTime - lastTimeCheck;
-    
+
         // Se mais de um segundo passou, atualize os FPS.
         if (timeElapsed >= 1e9) {
             fps = frameCount * (1e9 / timeElapsed);
-    
+
             System.out.println("FPS Calculado: " + fps); // Imprime o valor calculado de FPS para teste
-           
+
             if (controlPanel != null) {
                 SwingUtilities.invokeLater(() -> controlPanel.updateFpsLabel(fps));
             }
             frameCount = 0;
             lastTimeCheck = currentTime;
-           
+
         }
         frameCount++;
-       
-        //calculateFps();
+
+        // calculateFps();
     }
-
-
-
-
 
     class GridPanel extends JPanel {
         public GridPanel() {
             setPreferredSize(new Dimension(Simulation.this.width, Simulation.this.height));
-    
+
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -204,46 +196,48 @@ private void configureKeyBindings() {
                     addParticleTimer.start();
                     addParticle(mousePosition.x, mousePosition.y);
                 }
-    
+
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     addParticleTimer.stop();
                 }
             });
-    
+
             addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
                     mousePosition = e.getPoint();
                 }
             });
-    
+
             addParticleTimer = new Timer(addParticleTimerDelay, e -> {
                 if (mousePosition != null) {
                     addParticle(mousePosition.x, mousePosition.y);
                 }
             });
         }
+
         private void addParticle(int x, int y) {
             int gridX = x / gridSize;
             int gridY = y / gridSize;
-        
+
             for (int dx = -addAreaRadius; dx <= addAreaRadius; dx++) {
                 for (int dy = -addAreaRadius; dy <= addAreaRadius; dy++) {
                     int newX = gridX + dx;
                     int newY = gridY + dy;
-        
+
                     // Verifica se a célula está dentro do círculo
                     if (Math.sqrt(dx * dx + dy * dy) <= addAreaRadius) {
                         // Verifica se as novas coordenadas estão dentro dos limites do grid
                         if (newX >= 0 && newX < grid.length && newY >= 0 && newY < grid[0].length) {
-                            // Decide aleatoriamente se a célula será preenchida, com base na porcentagem de preenchimento
+                            // Decide aleatoriamente se a célula será preenchida, com base na porcentagem de
+                            // preenchimento
                             if (selectedParticleType instanceof Eraser) {
                                 grid[newX][newY] = null; // Apaga a partícula existente
                             }
-                           
+
                             if (grid[newX][newY] == null && rand.nextDouble() < fillPercentage) {
-                                
+
                                 if (selectedParticleType instanceof Eraser) {
                                     grid[newX][newY] = null; // Apaga a partícula existente
                                 }
@@ -254,22 +248,23 @@ private void configureKeyBindings() {
                                     grid[newX][newY] = new WaterParticle();
                                 } else if (selectedParticleType instanceof StoneParticle) {
                                     grid[newX][newY] = new StoneParticle();
-                                }  else if (selectedParticleType instanceof SmokeParticle) {
+                                } else if (selectedParticleType instanceof SmokeParticle) {
                                     grid[newX][newY] = new SmokeParticle();
-                                }  else if (selectedParticleType instanceof AcidParticle) {
+                                } else if (selectedParticleType instanceof AcidParticle) {
                                     grid[newX][newY] = new AcidParticle();
-                                }  else if (selectedParticleType instanceof SeedTree) {
+                                } else if (selectedParticleType instanceof SeedTree) {
                                     grid[newX][newY] = new SeedTree();
-                                } 
-                                
+                                }
+
                             }
                         }
                     }
                 }
             }
-            
+
             repaint();
         }
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -279,26 +274,28 @@ private void configureKeyBindings() {
                         grid[i][j].draw(g, i * gridSize, j * gridSize, gridSize);
                     }
                     // Desenha as bordas do grid se necessário
-                  //  g.setColor(Color.BLACK);
-                    //g.drawRect(i * gridSize, j * gridSize, gridSize, gridSize);
+                    // g.setColor(Color.BLACK);
+                    // g.drawRect(i * gridSize, j * gridSize, gridSize, gridSize);
                 }
             }
         }
-        
+
     }
-    private double calculateFps() {
+
+    /*private double calculateFps() {
         long currentTime = System.nanoTime();
         long timeElapsed = currentTime - lastTimeCheck;
-    
+
         if (timeElapsed >= 1e9) {
             fps = frameCount * (1e9 / timeElapsed);
             frameCount = 0;
             lastTimeCheck = currentTime;
         }
-    
+
         frameCount++;
         return fps;
-    }
+    }*/
+
     public void clearGrid() {
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
@@ -307,26 +304,29 @@ private void configureKeyBindings() {
         }
         repaint();
     }
+
     public void setSelectedParticleType(Particle particle) {
         selectedParticleType = particle;
     }
-    
+
     private void createControlPanel() {
         ControlPanel controlPanel = new ControlPanel(this);
         this.add(controlPanel, BorderLayout.PAGE_START);
     }
-    
 
     public int getAddAreaRadius() {
         return addAreaRadius;
     }
+
     public double getFillPercentage() {
         return fillPercentage;
     }
+
     public double getFps() {
         return fps;
     }
-        public static void main(String[] args) {
-            SwingUtilities.invokeLater(Simulation::new);
-        }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Simulation::new);
+    }
 }

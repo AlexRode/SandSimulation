@@ -13,7 +13,7 @@ import scr.Particles.Particle;
 public class SmokeParticle extends Particle {
     protected double lateralDispersion = 2;
     private int lifetime; // Tempo de vida da partícula em atualizações
-    private static final int MAX_LIFETIME = 100; 
+    //private static final int MAX_LIFETIME = 100; 
     private static final Color[] SMOKE_COLORS = {
         new Color(192, 192, 192, 128), // Cinza claro com transparência
         new Color(169, 169, 169, 128), // Cinza escuro com transparência
@@ -33,8 +33,8 @@ public class SmokeParticle extends Particle {
    @Override
 public void update(Particle[][] grid, int x, int y) {
     int gridWidth = grid.length;
-    int gridHeight = grid[0].length;
-    Random random = new Random();
+    //int gridHeight = grid[0].length;
+    //Random random = new Random();
 
     // Verifica se não está na parte inferior do grid
     if (y > 0) {

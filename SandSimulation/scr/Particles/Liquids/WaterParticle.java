@@ -16,7 +16,7 @@ public class WaterParticle extends Liquid{
     };
 
 
-    private Random random = new Random();
+    //private Random random = new Random();
     public WaterParticle() {
         super( WATER_COLORS[new Random().nextInt(WATER_COLORS.length)]);
         //TODO Auto-generated constructor stub
